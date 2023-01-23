@@ -5,6 +5,10 @@ on:
     branches:
       - add-more-ci-commands
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
     build-cache:
       runs-on: ubuntu-latest
@@ -18,6 +22,10 @@ jobs:
               /home/runner/.cache/Cypress
               **/node_modules
             key: our-cache-yarn-${{ hashFiles('**/yarn.lock.json') }}
+
+        - name: Install dependencies
+          if: steps.yarn-cache.outputs.cache-hit != 'true'
+          run: yarn install
 
     build-Lint:
       needs: build-cache
